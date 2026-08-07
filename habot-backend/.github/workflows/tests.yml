@@ -1,0 +1,20 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create CI environment file
+        run: |
+          printf '%s\n' 'DEBUG=False' 'SECRET_KEY=ci-only-secret-key' 'ALLOWED_HOSTS=localhost' 'DATABASE_URL=sqlite:////tmp/ci.sqlite3' 'CORS_ALLOW_ALL_ORIGINS=False' > .env
+      - name: Build backend image
+        run: docker compose build backend
+      - name: Run migrations
+        run: docker compose run --rm -e DJANGO_SETTINGS_MODULE=config.settings.test backend python manage.py migrate --noinput
+      - name: Run tests
+        run: docker compose run --rm backend pytest

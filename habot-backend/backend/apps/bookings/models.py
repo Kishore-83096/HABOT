@@ -34,6 +34,12 @@ class Booking(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("availability",),
+                name="one_booking_per_availability",
+            )
+        ]
 
     def __str__(self):
         return f"Booking {self.id}"

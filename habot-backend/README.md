@@ -13,6 +13,8 @@ Docker-first Django backend using Neon PostgreSQL.
 
 The backend is available at `http://localhost:8000`, Django Admin at `/admin/`, and the health endpoint at `/health/`.
 
+Interactive OpenAPI documentation is available at `/api/docs/`; the OpenAPI schema is served at `/api/schema/`.
+
 ## Commands
 
 Run Django commands and tests inside Docker:
@@ -20,4 +22,5 @@ Run Django commands and tests inside Docker:
 ```sh
 docker compose run --rm backend python manage.py createsuperuser
 docker compose run --rm backend pytest
+docker compose run --rm backend python manage.py check
 ```

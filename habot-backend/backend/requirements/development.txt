@@ -1,0 +1,23 @@
+-r base.txt
+-r base.txt
+
+pytest
+pytest-django
+pytest-cov
+black
+ruff
+isort
+ipython
+pytest
+
+pytest-django
+
+pytest-cov
+
+black
+
+ruff
+
+isort
+
+ipython

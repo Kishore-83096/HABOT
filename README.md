@@ -11,6 +11,183 @@ The project is built to show the actual engineering work behind a hiring assignm
 
 ---
 
+# Quick Start: Test the API Without Running Local Code
+
+## Deployed API
+
+Use the live backend service here:
+
+- Base URL: https://habot-uq89.onrender.com
+
+Example:
+
+```bash
+curl https://habot-uq89.onrender.com/health/
+```
+
+This is the fastest way to test the APIs without setting up the project locally. If you want to test against the local backend instead, point Postman or your client to `http://localhost:8000` after starting the app locally.
+
+## Postman Collection and Environment
+
+The repository already contains a Postman collection and environment:
+
+- Collection: `postman/HABOT.postman_collection.json`
+- Environment: `postman/HABOT.postman_environment.json`
+
+Import both files into Postman.
+
+- For the deployed service, set `base_url` to `https://habot-uq89.onrender.com`
+- For local testing, set `base_url` to `http://localhost:8000`
+
+The collection includes the main flow for:
+
+- health checks
+- parent APIs
+- LSA search
+- availability
+- booking creation
+- payment processing
+- dashboard checks
+
+## Step-by-Step: Download Repo, Install Docker, and Run the Backend
+
+### 1) Download the repository
+
+```bash
+git clone https://github.com/Kishore-83096/HABOT.git
+cd HABOT
+```
+
+### 2) Install Docker Desktop
+
+Download and install Docker Desktop from:
+
+- https://www.docker.com/products/docker-desktop/
+
+After installation, open Docker Desktop and wait until it is running.
+
+### 3) Configure environment variables
+
+From the repo root:
+
+```bash
+cd habot-backend
+copy .env.example .env
+```
+
+Update the `.env` file and set values like:
+
+```env
+SECRET_KEY=your-secret-key
+DATABASE_URL=postgresql://username:password@host:5432/database
+```
+
+If you are using the local Docker setup for a test environment, ensure the app is configured to use the local backend URL and not the deployed one.
+
+### 4) Build and start the app
+
+```bash
+docker compose up --build
+```
+
+This will build the Docker image and start the backend.
+
+### 5) Check that the app is running
+
+Open these URLs in a browser:
+
+- Local API: http://localhost:8000/health/
+- Swagger docs: http://localhost:8000/api/docs/
+
+### 6) Run migrations if required
+
+```bash
+docker compose exec backend python manage.py migrate
+```
+
+### 7) Create an admin user (optional)
+
+```bash
+docker compose exec backend python manage.py createsuperuser
+```
+
+### 8) Stop the app later
+
+```bash
+docker compose down
+```
+
+## Test the API with Postman
+
+### Import the Postman files
+
+Open Postman and import:
+
+- `postman/HABOT.postman_collection.json`
+- `postman/HABOT.postman_environment.json`
+
+### Set the base URL
+
+The environment file is already configured for local testing by default:
+
+```text
+base_url = http://localhost:8000
+api_prefix = /api/v1
+```
+
+This means the collection is set to the local backend by default.
+
+If you want to test the deployed backend instead, change `base_url` to:
+
+```text
+https://habot-uq89.onrender.com
+```
+
+Keep `api_prefix` as `/api/v1`.
+
+### Run the request flow
+
+Run the requests in order from the collection. The collection will populate environment variables such as:
+
+- `parent_id`
+- `lsa_id`
+- `availability_id`
+- `booking_id`
+- `payment_id`
+
+Example local checks:
+
+```bash
+curl http://localhost:8000/health/
+curl "http://localhost:8000/api/v1/lsas/search/?skill=Autism"
+```
+
+## Run pytest Locally
+
+From the project root:
+
+```bash
+cd habot-backend
+pytest
+```
+
+Or through Docker:
+
+```bash
+cd habot-backend
+docker compose exec backend pytest
+```
+
+The local test suite verifies:
+
+- booking logic
+- API contracts
+- payment flow
+- health checks
+- DB constraints and query optimization
+
+---
+
 # 1. Project Overview
 
 The app models a very simple marketplace flow:
@@ -1358,7 +1535,7 @@ Parent dashboard
 Booking cancellation
 ```
 
-There is no Postman collection checked in to the repository, so I am not claiming that one exists.
+The repository includes a working Postman collection and environment in the `postman/` folder. Import both files and set the `base_url` value to either the deployed API (`https://habot-uq89.onrender.com`) or the local backend (`http://localhost:8000`).
 
 ---
 

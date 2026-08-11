@@ -1,0 +1,785 @@
+{
+  "info": {
+    "_postman_id": "d507c41c-21ed-4bf1-afe6-8a1a8ee6efe2",
+    "name": "HABOT",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "47872554"
+  },
+  "item": [
+    {
+      "name": "health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get parent",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const response = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Parents array exists\", function () {\r",
+              "  pm.expect(response.data).to.be.an(\"array\").that.is.not.empty;\r",
+              "});\r",
+              "\r",
+              "if (response.data && response.data.length > 0) {\r",
+              "  pm.environment.set(\"parent_id\", response.data[0].id);\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/parents/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "parents",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get parent detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "parents",
+            "{{parent_id}}",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Parent",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/parents/00000000-0000-0000-0000-000000000000/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "parents",
+            "00000000-0000-0000-0000-000000000000",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search All LSAs",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();\r",
+              "\r",
+              "pm.test(\"LSA list exists\", function () {\r",
+              "  pm.expect(res.success).to.eql(true);\r",
+              "  pm.expect(res.data).to.be.an(\"array\").that.is.not.empty;\r",
+              "});\r",
+              "\r",
+              "if (res.data && res.data.length > 0) {\r",
+              "  pm.environment.set(\"lsa_id\", res.data[0].id);\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search by Skill",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?skill=Autism",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "skill",
+              "value": "Autism"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search by Experience",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?experience=3",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "experience",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search by Rating",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?rating=5",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "rating",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search by Date",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?available_date={{test_date}}",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "available_date",
+              "value": "{{test_date}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Combined Search",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?skill=Autism&rating=4&available_date={{test_date}}",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "skill",
+              "value": "Autism"
+            },
+            {
+              "key": "rating",
+              "value": "4"
+            },
+            {
+              "key": "available_date",
+              "value": "{{test_date}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "No Results",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?skill=SomethingThatDoesNotExist",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "skill",
+              "value": "SomethingThatDoesNotExist"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Date",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?available_date=hello",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "available_date",
+              "value": "hello"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Experience",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?experience=-10",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "search",
+            ""
+          ],
+          "query": [
+            {
+              "key": "experience",
+              "value": "-10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "LSA Detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "{{lsa_id}}",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Availability",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Availability list is not empty\", () => {\r",
+              "  pm.expect(res.data).to.be.an(\"array\").that.is.not.empty;\r",
+              "});\r",
+              "\r",
+              "if (Array.isArray(res.data) && res.data.length > 0) {\r",
+              "  pm.environment.set(\"availability_id\", res.data[0].id);\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/availability/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "{{lsa_id}}",
+            "availability",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Booking",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"parent_id\": \"{{parent_id}}\",\r\n    \"availability_id\": \"{{availability_id}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/bookings/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Double Booking Test",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"parent_id\": \"{{parent_id}}\",\r\n    \"availability_id\": \"{{availability_id}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/bookings/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Payment Processing",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"booking_id\": \"{{second_booking_id}}\",\r\n    \"result\": \"failed\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/payments/process/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "payments",
+            "process",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create booking 2",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"parent_id\": \"{{parent_id}}\",\r\n    \"availability_id\": \"{{availability_id_2}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/bookings/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Payment Failure",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/payments/process/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "payments",
+            "process",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Webhook Testing",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"booking_id\": \"{{booking_id}}\",\r\n  \"result\": \"success\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/payments/webhook/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "payments",
+            "webhook",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Booking Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/bookings/{{booking_id}}/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "bookings",
+            "{{booking_id}}",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Booking List",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/bookings/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Parent Booking History",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/bookings/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "parents",
+            "{{parent_id}}",
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Parent Booking History [confirmed only]",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/bookings/?status=CONFIRMED",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "parents",
+            "{{parent_id}}",
+            "bookings",
+            ""
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "CONFIRMED"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Parent booking history [failed]",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/bookings/?status=FAILED",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "parents",
+            "{{parent_id}}",
+            "bookings",
+            ""
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "FAILED"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Parent Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/dashboard/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "parents",
+            "{{parent_id}}",
+            "dashboard",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "LSA Schedule",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/schedule/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "{{lsa_id}}",
+            "schedule",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "LSA Schedule [test dates]",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/schedule/?date={{test_date}}",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "{{lsa_id}}",
+            "schedule",
+            ""
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "{{test_date}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Cancellation",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/bookings/{{booking_id}}/cancel/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "bookings",
+            "{{booking_id}}",
+            "cancel",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "availabilty after Cancellation",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/availability/",
+          "host": [
+            "{{base_url}}{{api_prefix}}"
+          ],
+          "path": [
+            "lsas",
+            "{{lsa_id}}",
+            "availability",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

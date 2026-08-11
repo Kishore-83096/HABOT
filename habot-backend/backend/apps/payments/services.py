@@ -8,6 +8,7 @@ from apps.bookings.models import Booking
 from apps.lsas.models import Availability
 
 from .models import Payment
+from .payment_gateway import charge_payment
 
 logger = logging.getLogger("apps.payments")
 
@@ -20,6 +21,20 @@ def latest_payment_for_booking(booking_id):
         if not Booking.objects.filter(pk=booking_id).exists():
             raise NotFound({"booking_id": "Booking not found."}) from exc
         raise NotFound({"booking_id": "Payment not found for this booking."}) from exc
+
+
+def process_payment(booking_id, requested_result):
+    payment = latest_payment_for_booking(booking_id)
+
+    if payment.status == Payment.Status.INITIATED:
+        gateway_result = charge_payment(payment, requested_result)
+        result = gateway_result.get("result")
+        gateway_reference = gateway_result.get("gateway_reference", "")
+    else:
+        result = requested_result
+        gateway_reference = ""
+
+    return apply_payment_result(booking_id, result, gateway_reference)
 
 
 @transaction.atomic

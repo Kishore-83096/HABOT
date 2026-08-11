@@ -95,6 +95,8 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=False)
+PAYMENT_GATEWAY_URL = env("PAYMENT_GATEWAY_URL", default="http://127.0.0.1:8000/mock-payment-gateway")
+PAYMENT_GATEWAY_TIMEOUT = env.float("PAYMENT_GATEWAY_TIMEOUT", default=5.0)
 
 LOGGING = {
     "version": 1,

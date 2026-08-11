@@ -1,5 +1,6 @@
 from datetime import time, timedelta
 from decimal import Decimal
+from unittest.mock import Mock
 
 import pytest
 from django.utils import timezone
@@ -14,6 +15,21 @@ from apps.payments.models import Payment
 @pytest.fixture
 def api_client():
     return APIClient()
+
+
+@pytest.fixture(autouse=True)
+def mock_payment_gateway(monkeypatch):
+    def post(url, json, timeout):
+        response = Mock()
+        response.status_code = 200 if json["result"] == "success" else 400
+        response.json.return_value = {
+            "result": json["result"],
+            "gateway_reference": json.get("gateway_reference", f"mock-gateway-{json['payment_id']}"),
+        }
+        response.raise_for_status.return_value = None
+        return response
+
+    monkeypatch.setattr("apps.payments.payment_gateway.requests.post", post)
 
 
 @pytest.fixture

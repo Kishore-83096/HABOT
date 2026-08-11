@@ -1,5 +1,11 @@
+from datetime import date as date_type
+
 from django.db.models import Count, Prefetch, Q
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
+
+from apps.common.responses import EnvelopedListMixin, EnvelopedRetrieveMixin
 
 from .models import Availability, LSASkill, LSAProfile
 from .serializers import (
@@ -17,9 +23,17 @@ def lsa_queryset():
     return LSAProfile.objects.prefetch_related(Prefetch("lsa_skills", queryset=skills))
 
 
-class LSASearchAPIView(generics.ListAPIView):
+@extend_schema(
+    summary="Search LSAs",
+    description=(
+        "Search active LSA profiles by skill, minimum experience, minimum rating, "
+        "maximum hourly rate, or availability date."
+    ),
+)
+class LSASearchAPIView(EnvelopedListMixin, generics.ListAPIView):
     serializer_class = LSASummarySerializer
     pagination_class = None
+    success_message = "LSAs retrieved successfully."
 
     def get_queryset(self):
         query_serializer = LSASearchQuerySerializer(data=self.request.query_params)
@@ -47,16 +61,26 @@ class LSASearchAPIView(generics.ListAPIView):
         return queryset.filter(conditions).distinct()
 
 
-class LSADetailAPIView(generics.RetrieveAPIView):
+@extend_schema(
+    summary="Retrieve LSA profile",
+    description="Return a single active LSA profile with skills and rate information.",
+)
+class LSADetailAPIView(EnvelopedRetrieveMixin, generics.RetrieveAPIView):
     serializer_class = LSADetailSerializer
+    success_message = "LSA retrieved successfully."
 
     def get_queryset(self):
         return lsa_queryset().filter(is_active=True)
 
 
-class AvailabilityAPIView(generics.ListAPIView):
+@extend_schema(
+    summary="List available LSA slots",
+    description="Return only currently available slots for an active LSA profile.",
+)
+class AvailabilityAPIView(EnvelopedListMixin, generics.ListAPIView):
     serializer_class = AvailabilitySerializer
     pagination_class = None
+    success_message = "Availability slots retrieved successfully."
 
     def get_queryset(self):
         # select_related keeps this endpoint efficient if its serializer grows to expose LSA data.
@@ -67,16 +91,19 @@ class AvailabilityAPIView(generics.ListAPIView):
         )
 
 
-class LSAScheduleAPIView(generics.ListAPIView):
+@extend_schema(
+    summary="List LSA schedule",
+    description="Return all visible schedule slots for an LSA, optionally filtered by date.",
+)
+class LSAScheduleAPIView(EnvelopedListMixin, generics.ListAPIView):
     serializer_class = ScheduleAvailabilitySerializer
     pagination_class = None
+    success_message = "LSA schedule retrieved successfully."
 
     def get_queryset(self):
         queryset = Availability.objects.select_related("lsa").filter(lsa_id=self.kwargs["pk"])
         if date := self.request.query_params.get("date"):
             # Let Django's query parsing return its standard 400 for invalid dates.
-            from rest_framework.exceptions import ValidationError
-            from datetime import date as date_type
             try:
                 date_type.fromisoformat(date)
             except ValueError as exc:

@@ -1,3 +1,5 @@
+import logging
+
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import NotFound
@@ -6,6 +8,8 @@ from apps.bookings.models import Booking
 from apps.lsas.models import Availability
 
 from .models import Payment
+
+logger = logging.getLogger("apps.payments")
 
 
 def latest_payment_for_booking(booking_id):
@@ -46,5 +50,20 @@ def apply_payment_result(booking_id, result, gateway_reference=""):
         payment.save(update_fields=("status", "gateway_reference", "transaction_time"))
         booking.save(update_fields=("status", "updated_at"))
         availability.save(update_fields=("status",))
+        log_method = logger.info if payment.status == Payment.Status.SUCCESS else logger.warning
+        log_method(
+            "Payment processed booking_id=%s payment_id=%s result=%s",
+            booking.id,
+            payment.id,
+            result,
+        )
+    else:
+        logger.info(
+            "Payment webhook idempotent no-op booking_id=%s payment_id=%s current_status=%s requested_result=%s",
+            booking.id,
+            payment.id,
+            payment.status,
+            result,
+        )
 
     return payment, booking, availability

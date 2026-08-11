@@ -1,23 +1,9 @@
 -r base.txt
--r base.txt
 
-pytest
-pytest-django
-pytest-cov
-black
-ruff
-isort
-ipython
-pytest
-
-pytest-django
-
-pytest-cov
-
-black
-
-ruff
-
-isort
-
-ipython
+pytest==8.4.1
+pytest-django==4.11.1
+pytest-cov==6.2.1
+black==25.1.0
+ruff==0.12.4
+isort==6.0.1
+ipython==9.4.0

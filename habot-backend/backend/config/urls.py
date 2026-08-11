@@ -6,10 +6,16 @@ from django.http import JsonResponse
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+from apps.common.responses import error_payload, success_payload
+
 logger = logging.getLogger(__name__)
 
 
-def health_check(request):
+def live_check(request):
+    return JsonResponse(success_payload({"status": "ok"}, message="Application is live."))
+
+
+def ready_check(request):
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
@@ -17,16 +23,26 @@ def health_check(request):
     except Exception:
         logger.exception("Health check database probe failed")
         return JsonResponse(
-            {"status": "unhealthy", "database": "unavailable"},
+            error_payload(
+                message="Application is not ready.",
+                errors={"database": "unavailable"},
+            ),
             status=503,
         )
 
-    return JsonResponse({"status": "ok", "database": "connected"})
+    return JsonResponse(
+        success_payload(
+            {"status": "ok", "database": "connected"},
+            message="Application is ready.",
+        )
+    )
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("health/", health_check, name="health-check"),
+    path("health/", ready_check, name="health-check"),
+    path("health/live/", live_check, name="health-live"),
+    path("health/ready/", ready_check, name="health-ready"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("api/v1/parents/", include("apps.parents.urls")),

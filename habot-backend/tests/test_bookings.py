@@ -50,11 +50,13 @@ def test_successful_booking_creates_payment_and_reserves_slot(api_client, parent
     )
 
     assert response.status_code == 201
-    assert response.data["status"] == Booking.Status.PAYMENT_PENDING
-    assert response.data["payment_status"] == Payment.Status.INITIATED
+    assert response.data["success"] is True
+    data = response.data["data"]
+    assert data["status"] == Booking.Status.PAYMENT_PENDING
+    assert data["payment_status"] == Payment.Status.INITIATED
     availability.refresh_from_db()
     assert availability.status == Availability.Status.BOOKED
-    payment = Payment.objects.get(booking_id=response.data["booking_id"])
+    payment = Payment.objects.get(booking_id=data["booking_id"])
     assert payment.amount == Decimal("800.00")
 
 
@@ -66,7 +68,9 @@ def test_reserved_slot_cannot_be_booked_again(api_client, parent, availability):
     response = api_client.post("/api/v1/bookings/", payload, format="json")
 
     assert response.status_code == 400
-    assert response.data["availability_id"] == "This slot is no longer available."
+    assert response.data["success"] is False
+    assert response.data["message"] == "This slot is no longer available."
+    assert "availability_id" in response.data["errors"]
 
 
 @pytest.mark.django_db
@@ -78,6 +82,7 @@ def test_invalid_parent_and_availability_return_not_found(api_client, parent):
         format="json",
     )
     assert invalid_parent.status_code == 404
+    assert invalid_parent.data["success"] is False
 
     invalid_availability = api_client.post(
         "/api/v1/bookings/",
@@ -85,3 +90,4 @@ def test_invalid_parent_and_availability_return_not_found(api_client, parent):
         format="json",
     )
     assert invalid_availability.status_code == 404
+    assert invalid_availability.data["success"] is False

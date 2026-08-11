@@ -39,9 +39,9 @@ def test_list_and_retrieve_parent(client, parent):
     detail_response = client.get(f"/api/v1/parents/{parent.id}/")
 
     assert list_response.status_code == 200
-    assert list_response.json() == [{"id": str(parent.id), "full_name": "John Doe"}]
+    assert list_response.json()["data"] == [{"id": str(parent.id), "full_name": "John Doe"}]
     assert detail_response.status_code == 200
-    assert detail_response.json() == {
+    assert detail_response.json()["data"] == {
         "id": str(parent.id),
         "full_name": "John Doe",
         "email": "john@example.com",
@@ -54,7 +54,7 @@ def test_search_filters_by_skill_and_rating(client, lsa):
     response = client.get("/api/v1/lsas/search/", {"skill": "autism", "rating": "4.5"})
 
     assert response.status_code == 200
-    assert response.json() == [
+    assert response.json()["data"] == [
         {
             "id": str(lsa.id),
             "name": "Alice",
@@ -71,7 +71,7 @@ def test_retrieve_active_lsa_profile(client, lsa):
     response = client.get(f"/api/v1/lsas/{lsa.id}/")
 
     assert response.status_code == 200
-    assert response.json() == {
+    assert response.json()["data"] == {
         "id": str(lsa.id),
         "name": "Alice",
         "bio": "Experienced learning support assistant.",
@@ -104,9 +104,9 @@ def test_search_filters_by_available_slot_and_hides_booked_slots(client, lsa):
     availability_response = client.get(f"/api/v1/lsas/{lsa.id}/availability/")
 
     assert search_response.status_code == 200
-    assert [item["id"] for item in search_response.json()] == [str(lsa.id)]
+    assert [item["id"] for item in search_response.json()["data"]] == [str(lsa.id)]
     assert availability_response.status_code == 200
-    assert availability_response.json() == [
+    assert availability_response.json()["data"] == [
         {
             "id": str(available.id),
             "date": "2026-08-10",
@@ -124,5 +124,7 @@ def test_search_validates_invalid_parameters_and_returns_empty_results(client, l
 
     assert invalid_date.status_code == 400
     assert negative_experience.status_code == 400
+    assert invalid_date.json()["success"] is False
+    assert negative_experience.json()["success"] is False
     assert no_match.status_code == 200
-    assert no_match.json() == []
+    assert no_match.json()["data"] == []

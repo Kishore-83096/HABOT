@@ -32,7 +32,7 @@ def test_lsa_search_uses_a_constant_two_queries(django_assert_num_queries, clien
         response = client.get("/api/v1/lsas/search/")
 
     assert response.status_code == 200
-    assert len(response.json()) == 8
+    assert len(response.json()["data"]) == 8
 
 
 @pytest.mark.django_db
@@ -84,7 +84,7 @@ def test_search_filters_experience_and_hourly_rate(client):
     response = client.get("/api/v1/lsas/search/", {"experience": 5, "hourly_rate_max": "50.00"})
 
     assert response.status_code == 200
-    assert [item["id"] for item in response.json()] == [str(qualified.id)]
+    assert [item["id"] for item in response.json()["data"]] == [str(qualified.id)]
 
 
 @pytest.mark.django_db
@@ -92,7 +92,8 @@ def test_missing_booking_returns_a_consistent_detail_error(client):
     response = client.get("/api/v1/bookings/00000000-0000-0000-0000-000000000001/")
 
     assert response.status_code == 404
-    assert response.json() == {"detail": "Booking not found."}
+    assert response.json()["success"] is False
+    assert response.json()["message"] == "Booking not found."
 
 
 @pytest.mark.django_db
@@ -107,7 +108,8 @@ def test_cannot_cancel_completed_booking(client):
     response = client.post(f"/api/v1/bookings/{booking.id}/cancel/")
 
     assert response.status_code == 400
-    assert response.json() == {"status": "Only pending or confirmed bookings can be cancelled."}
+    assert response.json()["success"] is False
+    assert response.json()["message"] == "Only pending or confirmed bookings can be cancelled."
 
 
 @pytest.mark.django_db
@@ -115,4 +117,5 @@ def test_schedule_rejects_an_invalid_date(client):
     response = client.get("/api/v1/lsas/00000000-0000-0000-0000-000000000001/schedule/?date=not-a-date")
 
     assert response.status_code == 400
-    assert response.json() == {"date": "Use ISO-8601 date format (YYYY-MM-DD)."}
+    assert response.json()["success"] is False
+    assert response.json()["message"] == "Use ISO-8601 date format (YYYY-MM-DD)."

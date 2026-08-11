@@ -32,7 +32,7 @@ def pending_booking(api_client):
         "/api/v1/bookings/", {"parent_id": str(parent.id), "availability_id": str(slot.id)}, format="json"
     )
     assert response.status_code == 201
-    return Booking.objects.get(pk=response.data["booking_id"])
+    return Booking.objects.get(pk=response.data["data"]["booking_id"])
 
 
 @pytest.mark.django_db
@@ -42,8 +42,9 @@ def test_successful_payment_confirms_booking_and_keeps_slot_booked(api_client, p
     )
 
     assert response.status_code == 200
-    assert response.data["payment_status"] == Payment.Status.SUCCESS
-    assert response.data["booking_status"] == Booking.Status.CONFIRMED
+    assert response.data["success"] is True
+    assert response.data["data"]["payment_status"] == Payment.Status.SUCCESS
+    assert response.data["data"]["booking_status"] == Booking.Status.CONFIRMED
     pending_booking.refresh_from_db()
     pending_booking.availability.refresh_from_db()
     assert pending_booking.availability.status == Availability.Status.BOOKED
@@ -56,8 +57,8 @@ def test_failed_payment_fails_booking_and_releases_slot(api_client, pending_book
     )
 
     assert response.status_code == 200
-    assert response.data["payment_status"] == Payment.Status.FAILED
-    assert response.data["booking_status"] == Booking.Status.FAILED
+    assert response.data["data"]["payment_status"] == Payment.Status.FAILED
+    assert response.data["data"]["booking_status"] == Booking.Status.FAILED
     pending_booking.refresh_from_db()
     pending_booking.availability.refresh_from_db()
     assert pending_booking.availability.status == Availability.Status.AVAILABLE
@@ -86,7 +87,7 @@ def test_repeated_webhook_is_idempotent(api_client, pending_booking):
     second = api_client.post("/api/v1/payments/webhook/", payload, format="json")
 
     assert first.status_code == second.status_code == 200
-    assert second.data["payment_status"] == Payment.Status.FAILED
+    assert second.data["data"]["payment_status"] == Payment.Status.FAILED
     assert Payment.objects.filter(booking=pending_booking).count() == 1
     pending_booking.refresh_from_db()
     pending_booking.availability.refresh_from_db()
@@ -103,6 +104,6 @@ def test_parent_booking_status_returns_latest_booking_and_payment(api_client, pe
     response = api_client.get(f"/api/v1/parents/{pending_booking.parent_id}/bookings/")
 
     assert response.status_code == 200
-    assert response.data[0]["id"] == str(pending_booking.id)
-    assert response.data[0]["status"] == Booking.Status.CONFIRMED
-    assert response.data[0]["payment_status"] == Payment.Status.SUCCESS
+    assert response.data["data"][0]["id"] == str(pending_booking.id)
+    assert response.data["data"][0]["status"] == Booking.Status.CONFIRMED
+    assert response.data["data"][0]["payment_status"] == Payment.Status.SUCCESS

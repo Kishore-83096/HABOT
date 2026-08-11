@@ -1,0 +1,5 @@
+# Ignore generated zip folder at the repository root
+zipped/
+
+# Ignore zip files in the repo root
+*.zip

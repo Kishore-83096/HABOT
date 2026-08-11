@@ -2,7 +2,7 @@
 
 **Candidate:** Jaya Kishore Siripurapu  
 **Position:** Python Backend Developer  
-**Email:** `<your-email>`  
+**Email:** `kishore.siripurapu1484@gmail.com`  
 **Project:** HABOT Connect Backend
 
 This is the backend for the HABOT Connect hiring project. It is a Django + Django REST Framework project that helps a mock Parent pick an LSA, check available time slots, create a booking, and process a mock HTTP payment flow. The project is intentionally scoped around the backend logic rather than user registration or real authentication.

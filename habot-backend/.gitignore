@@ -7,3 +7,10 @@ htmlcov/
 .vscode/
 .idea/
 staticfiles/
+
+# Ignore generated zip archive at the repo root
+/zipped/
+/zipped/*
+
+# Also ignore any zip files in the repository root
+/*.zip

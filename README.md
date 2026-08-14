@@ -1687,6 +1687,83 @@ These are outside the hiring-project scope. That is not a weakness of the projec
 
 # 42. Future Improvements
 
+---
+
+# Complete Postman End-to-End Testing
+
+The Postman suite in `postman/HABOT.postman_collection.json` is self-contained. It does not require manually seeded Parent, LSA, Skill, Availability, Booking, or Payment records.
+
+## Run The Collection
+
+1. Start the backend:
+
+```bash
+cd habot-backend
+docker compose up --build backend
+```
+
+2. Import `postman/HABOT.postman_collection.json` into Postman.
+3. Import `postman/HABOT.postman_environment.json` into Postman.
+4. Set `base_url` if your backend is not running at `http://localhost:8000`.
+5. Run the collection from the first folder through `10 - Cleanup`.
+
+## What The Suite Creates
+
+The first request calls:
+
+```text
+POST /api/v1/test-data/bootstrap/
+```
+
+It creates a unique run-scoped fixture using a `POSTMAN_TEST_...` marker:
+
+- temporary staff test user
+- temporary Parent
+- temporary LSA
+- temporary Skill
+- LSA to Skill mapping
+- two future Availability slots
+
+The bootstrap response is saved into environment variables such as `test_run_id`, `admin_id`, `parent_id`, `lsa_id`, `skill_id`, `skill_name`, `lsa_skill_id`, `availability_id`, `availability_id_2`, `booking_id`, and `payment_id`.
+
+## Tested Flow
+
+The collection then exercises the real public APIs:
+
+- health check
+- LSA search by dynamically created Skill
+- LSA search by generated Availability date
+- LSA detail
+- Availability and schedule
+- Parent detail
+- booking creation
+- double-booking rejection
+- payment processing
+- payment webhook idempotency
+- booking detail
+- cancellation lifecycle
+- parent booking history
+- parent dashboard
+- negative validation cases
+
+## Cleanup
+
+The final request calls:
+
+```text
+DELETE /api/v1/test-data/cleanup/{{test_run_id}}/
+```
+
+Cleanup deletes only records marked for that exact test run. If a collection run fails halfway through, keep the `test_run_id` value and run only the `10 - Cleanup / Cleanup Test Run` request. The cleanup endpoint removes payments, bookings, availability, mappings, LSA, Parent, Skill, and the temporary staff user for that run.
+
+## Safety Restrictions
+
+The test-data API is controlled by `TEST_DATA_API_ENABLED`. It is enabled in development/test settings and explicitly disabled in production settings. Cleanup rejects non-`POSTMAN_TEST_` run IDs and never accepts arbitrary business record IDs for deletion.
+
+---
+
+# 43. Future Improvements
+
 If this project were extended later, the logical next steps would be:
 
 - add authentication and authorization
@@ -1702,7 +1779,7 @@ These are sensible improvements, but they are not part of the current project sc
 
 ---
 
-# 43. Project Verification Summary
+# 44. Project Verification Summary
 
 ```text
 Backend: Django + DRF
@@ -1710,8 +1787,8 @@ Database: PostgreSQL / Neon-ready
 Containerization: Docker
 API Documentation: OpenAPI / Swagger
 Testing: pytest
-Automated Tests: 35 passed
-Manual API Testing: Postman workflow completed
+Automated Tests: 41 passed
+Manual API Testing: Postman collection updated and JSON validated
 CI: GitHub Actions
 ```
 
@@ -1719,7 +1796,7 @@ This reflects the current repo state after verification.
 
 ---
 
-# 44. Submission Checklist
+# 45. Submission Checklist
 
 - [x] Django backend implemented
 - [x] PostgreSQL database
@@ -1738,7 +1815,7 @@ This reflects the current repo state after verification.
 
 ---
 
-# 45. Final Developer Note
+# 46. Final Developer Note
 
 The main thing I focused on in this project was not just making the APIs work, but making sure the booking flow behaves correctly under real-world conditions. The database has to protect against duplicate bookings, the queries have to stay efficient, and the API has to return clear and consistent error states. I also kept the scope tight instead of adding auth or unrelated infrastructure because the hiring assignment was about the actual booking, search, and payment logic.
 

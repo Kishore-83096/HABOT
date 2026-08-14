@@ -1,785 +1,693 @@
 {
   "info": {
     "_postman_id": "d507c41c-21ed-4bf1-afe6-8a1a8ee6efe2",
-    "name": "HABOT",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "47872554"
+    "name": "HABOT - Self-contained E2E API Suite",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test(\"Response is valid JSON\", function () {",
+          "  pm.response.to.have.jsonBody();",
+          "});"
+        ]
+      }
+    }
+  ],
   "item": [
     {
-      "name": "health",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/health/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "health",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "get parent",
-      "event": [
+      "name": "00 - Environment & Health",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "const response = pm.response.json();\r",
-              "\r",
-              "pm.test(\"Parents array exists\", function () {\r",
-              "  pm.expect(response.data).to.be.an(\"array\").that.is.not.empty;\r",
-              "});\r",
-              "\r",
-              "if (response.data && response.data.length > 0) {\r",
-              "  pm.environment.set(\"parent_id\", response.data[0].id);\r",
-              "}"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Health succeeds\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.success).to.eql(true);",
+                  "  pm.expect(res.data.database).to.eql(\"connected\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/health/"
           }
         }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/parents/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "parents",
-            ""
-          ]
-        }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "get parent detail",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "parents",
-            "{{parent_id}}",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Invalid Parent",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/parents/00000000-0000-0000-0000-000000000000/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "parents",
-            "00000000-0000-0000-0000-000000000000",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Search All LSAs",
-      "event": [
+      "name": "01 - Test Data Setup",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "const res = pm.response.json();\r",
-              "\r",
-              "pm.test(\"LSA list exists\", function () {\r",
-              "  pm.expect(res.success).to.eql(true);\r",
-              "  pm.expect(res.data).to.be.an(\"array\").that.is.not.empty;\r",
-              "});\r",
-              "\r",
-              "if (res.data && res.data.length > 0) {\r",
-              "  pm.environment.set(\"lsa_id\", res.data[0].id);\r",
-              "}"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Search by Skill",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?skill=Autism",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ],
-          "query": [
+          "name": "Bootstrap Test Run",
+          "event": [
             {
-              "key": "skill",
-              "value": "Autism"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Search by Experience",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?experience=3",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ],
-          "query": [
-            {
-              "key": "experience",
-              "value": "3"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Search by Rating",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?rating=5",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ],
-          "query": [
-            {
-              "key": "rating",
-              "value": "5"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Search by Date",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?available_date={{test_date}}",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ],
-          "query": [
-            {
-              "key": "available_date",
-              "value": "{{test_date}}"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Combined Search",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?skill=Autism&rating=4&available_date={{test_date}}",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ],
-          "query": [
-            {
-              "key": "skill",
-              "value": "Autism"
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const guid = pm.variables.replaceIn(\"{{$guid}}\").replace(/-/g, \"\");",
+                  "pm.environment.set(\"test_run_id\", `POSTMAN_TEST_${Date.now()}_${guid}`);"
+                ]
+              }
             },
             {
-              "key": "rating",
-              "value": "4"
-            },
-            {
-              "key": "available_date",
-              "value": "{{test_date}}"
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "const data = res.data || {};",
+                  "pm.test(\"Bootstrap succeeded\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "  pm.expect(res.success).to.eql(true);",
+                  "  pm.expect(data.test_run_id).to.eql(pm.environment.get(\"test_run_id\"));",
+                  "  pm.expect(data.parent.id).to.be.a(\"string\");",
+                  "  pm.expect(data.lsa.id).to.be.a(\"string\");",
+                  "  pm.expect(data.skills).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(data.lsa_skills).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(data.availability).to.be.an(\"array\").with.length.greaterThan(1);",
+                  "});",
+                  "pm.environment.set(\"admin_id\", data.admin.id);",
+                  "pm.environment.set(\"admin_username\", data.admin.username);",
+                  "pm.environment.set(\"parent_id\", data.parent.id);",
+                  "pm.environment.set(\"lsa_id\", data.lsa.id);",
+                  "pm.environment.set(\"skill_id\", data.skills[0].id);",
+                  "pm.environment.set(\"skill_name\", data.skills[0].name);",
+                  "pm.environment.set(\"lsa_skill_id\", data.lsa_skills[0].id);",
+                  "pm.environment.set(\"availability_id\", data.availability[0].id);",
+                  "pm.environment.set(\"availability_id_2\", data.availability[1].id);",
+                  "pm.environment.set(\"test_date\", data.availability[0].date);"
+                ]
+              }
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "No Results",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?skill=SomethingThatDoesNotExist",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
           ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ],
-          "query": [
-            {
-              "key": "skill",
-              "value": "SomethingThatDoesNotExist"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Invalid Date",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?available_date=hello",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ],
-          "query": [
-            {
-              "key": "available_date",
-              "value": "hello"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Invalid Experience",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/search/?experience=-10",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "search",
-            ""
-          ],
-          "query": [
-            {
-              "key": "experience",
-              "value": "-10"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "LSA Detail",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "{{lsa_id}}",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Availability",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "const res = pm.response.json();\r",
-              "\r",
-              "pm.test(\"Availability list is not empty\", () => {\r",
-              "  pm.expect(res.data).to.be.an(\"array\").that.is.not.empty;\r",
-              "});\r",
-              "\r",
-              "if (Array.isArray(res.data) && res.data.length > 0) {\r",
-              "  pm.environment.set(\"availability_id\", res.data[0].id);\r",
-              "}"
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"test_run_id\": \"{{test_run_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}{{api_prefix}}/test-data/bootstrap/"
           }
         }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/availability/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "{{lsa_id}}",
-            "availability",
-            ""
-          ]
-        }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Create Booking",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"parent_id\": \"{{parent_id}}\",\r\n    \"availability_id\": \"{{availability_id}}\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/bookings/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "bookings",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Double Booking Test",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"parent_id\": \"{{parent_id}}\",\r\n    \"availability_id\": \"{{availability_id}}\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/bookings/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "bookings",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Payment Processing",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"booking_id\": \"{{second_booking_id}}\",\r\n    \"result\": \"failed\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/payments/process/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "payments",
-            "process",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "create booking 2",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"parent_id\": \"{{parent_id}}\",\r\n    \"availability_id\": \"{{availability_id_2}}\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/bookings/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "bookings",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Payment Failure",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/payments/process/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "payments",
-            "process",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Webhook Testing",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n  \"booking_id\": \"{{booking_id}}\",\r\n  \"result\": \"success\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/payments/webhook/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "payments",
-            "webhook",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Booking Details",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/bookings/{{booking_id}}/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "bookings",
-            "{{booking_id}}",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Booking List",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/bookings/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "bookings",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Parent Booking History",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/bookings/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "parents",
-            "{{parent_id}}",
-            "bookings",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Parent Booking History [confirmed only]",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/bookings/?status=CONFIRMED",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "parents",
-            "{{parent_id}}",
-            "bookings",
-            ""
-          ],
-          "query": [
+      "name": "02 - LSA Discovery",
+      "item": [
+        {
+          "name": "Search LSAs By Dynamic Skill",
+          "event": [
             {
-              "key": "status",
-              "value": "CONFIRMED"
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Generated LSA is discoverable by skill\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const ids = res.data.map(item => item.id);",
+                  "  pm.expect(ids).to.include(pm.environment.get(\"lsa_id\"));",
+                  "  const lsa = res.data.find(item => item.id === pm.environment.get(\"lsa_id\"));",
+                  "  pm.expect(lsa.skills).to.include(pm.environment.get(\"skill_name\"));",
+                  "});"
+                ]
+              }
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Parent booking history [failed]",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/bookings/?status=FAILED",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
           ],
-          "path": [
-            "parents",
-            "{{parent_id}}",
-            "bookings",
-            ""
-          ],
-          "query": [
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/lsas/search/?skill={{skill_name}}"
+          }
+        },
+        {
+          "name": "Search LSAs By Dynamic Availability Date",
+          "event": [
             {
-              "key": "status",
-              "value": "FAILED"
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Generated LSA is discoverable by date\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.map(item => item.id)).to.include(pm.environment.get(\"lsa_id\"));",
+                  "});"
+                ]
+              }
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Parent Dashboard",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/dashboard/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
           ],
-          "path": [
-            "parents",
-            "{{parent_id}}",
-            "dashboard",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "LSA Schedule",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/schedule/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "{{lsa_id}}",
-            "schedule",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "LSA Schedule [test dates]",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/schedule/?date={{test_date}}",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
-          ],
-          "path": [
-            "lsas",
-            "{{lsa_id}}",
-            "schedule",
-            ""
-          ],
-          "query": [
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/lsas/search/?available_date={{test_date}}"
+          }
+        },
+        {
+          "name": "LSA Detail",
+          "event": [
             {
-              "key": "date",
-              "value": "{{test_date}}"
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"LSA detail matches fixture\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.id).to.eql(pm.environment.get(\"lsa_id\"));",
+                  "  pm.expect(res.data.skills).to.include(pm.environment.get(\"skill_name\"));",
+                  "});"
+                ]
+              }
             }
-          ]
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/"
+          }
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Cancellation",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/bookings/{{booking_id}}/cancel/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
+      "name": "03 - LSA Availability",
+      "item": [
+        {
+          "name": "Available Slots",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Fixture availability is visible\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.map(slot => slot.id)).to.include(pm.environment.get(\"availability_id\"));",
+                  "});"
+                ]
+              }
+            }
           ],
-          "path": [
-            "bookings",
-            "{{booking_id}}",
-            "cancel",
-            ""
-          ]
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/availability/"
+          }
+        },
+        {
+          "name": "Schedule For Test Date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Schedule exposes slot status\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const slot = res.data.find(item => item.id === pm.environment.get(\"availability_id\"));",
+                  "  pm.expect(slot.status).to.eql(\"AVAILABLE\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/schedule/?date={{test_date}}"
+          }
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "availabilty after Cancellation",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}{{api_prefix}}/lsas/{{lsa_id}}/availability/",
-          "host": [
-            "{{base_url}}{{api_prefix}}"
+      "name": "04 - Parent APIs",
+      "item": [
+        {
+          "name": "Parent Detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Parent detail matches fixture\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.id).to.eql(pm.environment.get(\"parent_id\"));",
+                  "  pm.expect(res.data.full_name).to.include(pm.environment.get(\"test_run_id\"));",
+                  "});"
+                ]
+              }
+            }
           ],
-          "path": [
-            "lsas",
-            "{{lsa_id}}",
-            "availability",
-            ""
-          ]
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/"
+          }
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "05 - Booking",
+      "item": [
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Booking is created from fixture IDs\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(res.data.booking_id).to.be.a(\"string\");",
+                  "  pm.expect(res.data.availability_id).to.eql(pm.environment.get(\"availability_id\"));",
+                  "  pm.expect(res.data.status).to.eql(\"PAYMENT_PENDING\");",
+                  "  pm.expect(res.data.payment_status).to.eql(\"INITIATED\");",
+                  "});",
+                  "pm.environment.set(\"booking_id\", res.data.booking_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parent_id\": \"{{parent_id}}\",\n  \"availability_id\": \"{{availability_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}{{api_prefix}}/bookings/"
+          }
+        },
+        {
+          "name": "Double Booking Is Rejected",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Double booking fails\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(res.success).to.eql(false);",
+                  "  pm.expect(res.errors).to.have.property(\"availability_id\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parent_id\": \"{{parent_id}}\",\n  \"availability_id\": \"{{availability_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}{{api_prefix}}/bookings/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Payment",
+      "item": [
+        {
+          "name": "Process Payment Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Payment confirms booking\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.booking_id).to.eql(pm.environment.get(\"booking_id\"));",
+                  "  pm.expect(res.data.payment_status).to.eql(\"SUCCESS\");",
+                  "  pm.expect(res.data.booking_status).to.eql(\"CONFIRMED\");",
+                  "  pm.expect(res.data.availability_status).to.eql(\"BOOKED\");",
+                  "});",
+                  "pm.environment.set(\"payment_id\", res.data.payment_id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": \"{{booking_id}}\",\n  \"result\": \"success\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}{{api_prefix}}/payments/process/"
+          }
+        },
+        {
+          "name": "Webhook Idempotency",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Terminal payment webhook is idempotent\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.payment_id).to.eql(pm.environment.get(\"payment_id\"));",
+                  "  pm.expect(res.data.payment_status).to.eql(\"SUCCESS\");",
+                  "  pm.expect(res.data.booking_status).to.eql(\"CONFIRMED\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": \"{{booking_id}}\",\n  \"result\": \"failed\",\n  \"gateway_reference\": \"postman-idempotency-check\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}{{api_prefix}}/payments/webhook/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Booking Lifecycle",
+      "item": [
+        {
+          "name": "Booking Detail After Payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Booking detail contains parent LSA and payment state\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.id).to.eql(pm.environment.get(\"booking_id\"));",
+                  "  pm.expect(res.data.parent.id).to.eql(pm.environment.get(\"parent_id\"));",
+                  "  pm.expect(res.data.lsa.id).to.eql(pm.environment.get(\"lsa_id\"));",
+                  "  pm.expect(res.data.availability.id).to.eql(pm.environment.get(\"availability_id\"));",
+                  "  pm.expect(res.data.payment_status).to.eql(\"SUCCESS\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/bookings/{{booking_id}}/"
+          }
+        },
+        {
+          "name": "Cancel Confirmed Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Cancellation releases booking\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.booking_status).to.eql(\"CANCELLED\");",
+                  "  pm.expect(res.data.availability.status).to.eql(\"AVAILABLE\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/bookings/{{booking_id}}/cancel/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Dashboard & Verification",
+      "item": [
+        {
+          "name": "Parent Booking History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Parent history includes generated booking\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.map(item => item.id)).to.include(pm.environment.get(\"booking_id\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/bookings/"
+          }
+        },
+        {
+          "name": "Parent Dashboard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Dashboard reflects lifecycle\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.data.total_bookings).to.be.at.least(1);",
+                  "  pm.expect(res.data.cancelled).to.be.at.least(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/parents/{{parent_id}}/dashboard/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Negative & Validation Tests",
+      "item": [
+        {
+          "name": "Invalid Parent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Invalid parent returns 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "  pm.expect(res.success).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/parents/00000000-0000-0000-0000-000000000000/"
+          }
+        },
+        {
+          "name": "Missing Booking Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Booking validation rejects missing fields\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(res.success).to.eql(false);",
+                  "  pm.expect(res.errors).to.have.property(\"availability_id\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parent_id\": \"{{parent_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}{{api_prefix}}/bookings/"
+          }
+        },
+        {
+          "name": "Invalid Payment Result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Payment validation rejects invalid result\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  pm.expect(res.success).to.eql(false);",
+                  "  pm.expect(res.errors).to.have.property(\"result\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": \"{{booking_id}}\",\n  \"result\": \"maybe\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{base_url}}{{api_prefix}}/payments/process/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Cleanup",
+      "item": [
+        {
+          "name": "Cleanup Test Run",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "pm.test(\"Cleanup succeeds and deletes fixture records\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(res.success).to.eql(true);",
+                  "  pm.expect(res.data.test_run_id).to.eql(pm.environment.get(\"test_run_id\"));",
+                  "  pm.expect(res.data.deleted.parents).to.be.at.least(1);",
+                  "  pm.expect(res.data.deleted.lsas).to.be.at.least(1);",
+                  "  pm.expect(res.data.deleted.skills).to.be.at.least(1);",
+                  "  pm.expect(res.data.deleted.admins).to.be.at.least(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/test-data/cleanup/{{test_run_id}}/"
+          }
+        }
+      ]
     }
   ]
 }

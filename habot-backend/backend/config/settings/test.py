@@ -7,3 +7,4 @@ DATABASES = {
         "NAME": ":memory:",
     }
 }
+TEST_DATA_API_ENABLED = True

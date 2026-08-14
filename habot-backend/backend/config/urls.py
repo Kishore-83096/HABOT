@@ -49,5 +49,6 @@ urlpatterns = [
     path("api/v1/lsas/", include("apps.lsas.urls")),
     path("api/v1/bookings/", include("apps.bookings.urls")),
     path("api/v1/payments/", include("apps.payments.urls")),
+    path("api/v1/test-data/", include("apps.testdata.urls")),
     path("mock-payment-gateway/", include("apps.payments.mock_gateway_urls")),
 ]

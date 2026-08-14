@@ -12,9 +12,13 @@ jobs:
       - name: Create CI environment file
         run: |
           printf '%s\n' 'DEBUG=False' 'SECRET_KEY=ci-only-secret-key' 'ALLOWED_HOSTS=localhost' 'DATABASE_URL=sqlite:////tmp/ci.sqlite3' 'CORS_ALLOW_ALL_ORIGINS=False' > .env
+        working-directory: habot-backend
       - name: Build backend image
         run: docker compose build backend
+        working-directory: habot-backend
       - name: Run migrations
         run: docker compose run --rm -e DJANGO_SETTINGS_MODULE=config.settings.test backend python manage.py migrate --noinput
+        working-directory: habot-backend
       - name: Run tests
         run: docker compose run --rm backend pytest
+        working-directory: habot-backend
